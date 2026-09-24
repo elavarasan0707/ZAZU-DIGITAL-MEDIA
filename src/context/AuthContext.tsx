@@ -120,8 +120,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const loginWithGoogle = async () => {
-    const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
+    try {
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+      await signInWithPopup(auth, provider);
+    } catch (err: any) {
+      console.warn('Google sign-in exception:', err?.code, err?.message);
+      if (err?.code === 'auth/configuration-not-found' || err?.message?.includes('configuration-not-found')) {
+        const customErr: any = new Error(
+          'Google Sign-In is not enabled yet in your Firebase Console (Authentication > Sign-in method > Google). Please create an account or sign in below with Email & Password.'
+        );
+        customErr.code = 'auth/configuration-not-found';
+        throw customErr;
+      }
+      throw err;
+    }
   };
 
   const resetPassword = async (email: string) => {

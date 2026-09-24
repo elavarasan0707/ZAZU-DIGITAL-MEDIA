@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Lock, User, UserPlus, AlertCircle } from 'lucide-react';
+import { Mail, Lock, User, UserPlus, AlertCircle, Info, ExternalLink } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Logo } from '../components/common/Logo';
 
@@ -14,6 +14,7 @@ export const SignupPage: React.FC<SignupPageProps> = ({ onNavigate }) => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [googleProviderNotice, setGoogleProviderNotice] = useState(false);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,7 +32,13 @@ export const SignupPage: React.FC<SignupPageProps> = ({ onNavigate }) => {
     } catch (err: any) {
       console.error('Signup error:', err);
       if (err.code === 'auth/email-already-in-use') {
-        setError('This email address is already in use. Please sign in instead.');
+        setError('This email address is already registered. Please sign in instead.');
+      } else if (err.code === 'auth/operation-not-allowed') {
+        setError(
+          'Email/Password sign-in method is not enabled in Firebase Console. Please go to Firebase Console > Authentication > Sign-in method and enable "Email/Password".'
+        );
+      } else if (err.code === 'auth/weak-password') {
+        setError('The password is too weak. Please use at least 6 characters.');
       } else {
         setError(err.message || 'Could not complete registration. Please try again.');
       }
@@ -43,12 +50,29 @@ export const SignupPage: React.FC<SignupPageProps> = ({ onNavigate }) => {
   const handleGoogleSignup = async () => {
     setLoading(true);
     setError('');
+    setGoogleProviderNotice(false);
     try {
       await loginWithGoogle();
       onNavigate('dashboard');
     } catch (err: any) {
       console.error('Google signup error:', err);
-      setError(err.message || 'Google sign-up failed. Please try again.');
+      if (
+        err.code === 'auth/configuration-not-found' ||
+        err.message?.includes('configuration-not-found')
+      ) {
+        setGoogleProviderNotice(true);
+        setError(
+          'Google Sign-In is not enabled yet in your Firebase project (zazu-digital-media). Please sign up below using Email & Password (instant access), or enable Google provider in Firebase Console.'
+        );
+      } else if (err.code === 'auth/popup-closed-by-user') {
+        setError('Sign-up popup was closed. Please try again or use email registration below.');
+      } else if (err.code === 'auth/unauthorized-domain') {
+        setError(
+          'Current domain is not listed in Firebase Console > Authentication > Settings > Authorized domains. Please use Email & Password registration below.'
+        );
+      } else {
+        setError(err.message || 'Google sign-up failed. Please use email & password registration below.');
+      }
     } finally {
       setLoading(false);
     }
@@ -73,9 +97,27 @@ export const SignupPage: React.FC<SignupPageProps> = ({ onNavigate }) => {
         </div>
 
         {error && (
-          <div className="mb-6 p-3.5 rounded-xl bg-red-50 border border-red-200 flex items-start gap-2.5 text-xs text-red-600">
-            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-            <span>{error}</span>
+          <div className="mb-6 p-3.5 rounded-xl bg-red-50 border border-red-200 flex items-start gap-2.5 text-xs text-red-700">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-600" />
+            <div className="space-y-1">
+              <p className="font-semibold">{error}</p>
+              {googleProviderNotice && (
+                <div className="mt-2 pt-2 border-t border-red-200/60 text-[11px] text-stone-700 space-y-1">
+                  <p className="font-bold flex items-center gap-1 text-stone-800">
+                    <Info className="w-3.5 h-3.5 text-[#1E56A0]" />
+                    <span>How to enable Google Sign-In in Firebase:</span>
+                  </p>
+                  <ol className="list-decimal list-inside space-y-0.5 text-stone-600 pl-1">
+                    <li>Open <strong>Firebase Console</strong> → select <strong>zazu-digital-media</strong></li>
+                    <li>Navigate to <strong>Build &gt; Authentication &gt; Sign-in method</strong></li>
+                    <li>Click <strong>Add new provider</strong> &gt; select <strong>Google</strong> &gt; toggle <strong>Enable</strong></li>
+                  </ol>
+                  <p className="text-[#1E56A0] font-bold mt-1">
+                    👉 Meanwhile, create your account with Email & Password below!
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
@@ -133,9 +175,21 @@ export const SignupPage: React.FC<SignupPageProps> = ({ onNavigate }) => {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-stone-700 mb-1.5">
-              Work Email Address *
-            </label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-xs font-bold text-stone-700">
+                Work Email Address *
+              </label>
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail('eladigitalw@gmail.com');
+                  if (!name) setName('Admin ZaZu');
+                }}
+                className="text-[10px] font-semibold text-[#1E56A0] hover:underline"
+              >
+                Use Admin Email
+              </button>
+            </div>
             <div className="relative">
               <input
                 type="email"

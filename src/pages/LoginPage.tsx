@@ -14,6 +14,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const [googleProviderNotice, setGoogleProviderNotice] = useState(false);
+
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -25,9 +27,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
     } catch (err: any) {
       console.error('Login error:', err);
       if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found') {
-        setError('Invalid email or password. Please verify your credentials or create a new account.');
+        setError('Invalid email or password. If you do not have an account yet, please click "Sign Up" below.');
       } else if (err.code === 'auth/too-many-requests') {
         setError('Too many failed attempts. Please wait a moment or reset your password.');
+      } else if (err.code === 'auth/operation-not-allowed') {
+        setError('Email/Password provider is not enabled in Firebase Console (Authentication > Sign-in method).');
       } else {
         setError(err.message || 'Authentication failed. Please check your credentials.');
       }
@@ -39,20 +43,33 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
   const handleGoogleLogin = async () => {
     setLoading(true);
     setError('');
+    setGoogleProviderNotice(false);
     try {
       await loginWithGoogle();
       onNavigate('dashboard');
     } catch (err: any) {
       console.error('Google login error:', err);
-      setError(err.message || 'Google sign-in was interrupted. Please try again.');
+      if (
+        err.code === 'auth/configuration-not-found' ||
+        err.message?.includes('configuration-not-found')
+      ) {
+        setGoogleProviderNotice(true);
+        setError(
+          'Google Sign-In is not enabled yet in your Firebase project (zazu-digital-media). Please sign in below using Email & Password, or enable Google Provider in Firebase Console.'
+        );
+      } else if (err.code === 'auth/popup-closed-by-user') {
+        setError('Sign-in window was closed. Please try again.');
+      } else {
+        setError(err.message || 'Google sign-in was interrupted. Please try again with email.');
+      }
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="py-16 sm:py-24 bg-[#FAF8F5] min-h-[80vh] flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-white rounded-3xl p-8 sm:p-10 border border-stone-200 shadow-xl text-left">
+    <div className="py-16 sm:py-24 bg-transparent relative z-10 min-h-[85vh] flex items-center justify-center px-4">
+      <div className="w-full max-w-md bg-white/95 backdrop-blur-md rounded-3xl p-8 sm:p-10 border border-stone-200/90 shadow-2xl text-left card-3d">
         <div className="text-center mb-8">
           <div
             onClick={() => onNavigate('home')}
@@ -69,9 +86,24 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
         </div>
 
         {error && (
-          <div className="mb-6 p-3.5 rounded-xl bg-red-50 border border-red-200 flex items-start gap-2.5 text-xs text-red-600">
-            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-            <span>{error}</span>
+          <div className="mb-6 p-3.5 rounded-xl bg-red-50 border border-red-200 flex items-start gap-2.5 text-xs text-red-700">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-600" />
+            <div className="space-y-1">
+              <p className="font-semibold">{error}</p>
+              {googleProviderNotice && (
+                <div className="mt-2 pt-2 border-t border-red-200/60 text-[11px] text-stone-700 space-y-1">
+                  <p className="font-bold text-stone-800">
+                    To enable Google Sign-In:
+                  </p>
+                  <p className="text-stone-600">
+                    Open <strong>Firebase Console &gt; Authentication &gt; Sign-in method</strong>, add <strong>Google</strong>, and enable it.
+                  </p>
+                  <p className="text-[#1E56A0] font-bold">
+                    Or sign in with your Email & Password below!
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
