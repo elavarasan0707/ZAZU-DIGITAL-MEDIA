@@ -1,0 +1,201 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "User profile with role-based access",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 256 },
+        "displayName": { "type": "string", "maxLength": 128 },
+        "role": { "type": "string", "enum": ["admin", "client"], "maxLength": 20 },
+        "photoURL": { "type": "string", "maxLength": 1024 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "email", "role"]
+    },
+    "Project": {
+      "title": "Portfolio Project",
+      "description": "Portfolio work showcase",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 160 },
+        "clientName": { "type": "string", "maxLength": 160 },
+        "category": { "type": "string", "maxLength": 100 },
+        "service": { "type": "string", "maxLength": 100 },
+        "description": { "type": "string", "maxLength": 3000 },
+        "results": { "type": "string", "maxLength": 1000 },
+        "metrics": { "type": "string", "maxLength": 500 },
+        "imageUrl": { "type": "string", "maxLength": 2048 },
+        "tags": { "type": "array" },
+        "featured": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "title", "category", "description"]
+    },
+    "Service": {
+      "title": "Service Offering",
+      "description": "Agency marketing service offering",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 160 },
+        "slug": { "type": "string", "maxLength": 160 },
+        "icon": { "type": "string", "maxLength": 64 },
+        "shortDesc": { "type": "string", "maxLength": 400 },
+        "fullDesc": { "type": "string", "maxLength": 3000 },
+        "deliverables": { "type": "array" },
+        "order": { "type": "number" },
+        "active": { "type": "boolean" }
+      },
+      "required": ["id", "name", "slug", "shortDesc"]
+    },
+    "PricingPlan": {
+      "title": "Pricing Tier",
+      "description": "Pricing package tier",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 100 },
+        "planType": { "type": "string", "maxLength": 60 },
+        "price": { "type": "string", "maxLength": 60 },
+        "billingPeriod": { "type": "string", "maxLength": 60 },
+        "description": { "type": "string", "maxLength": 500 },
+        "features": { "type": "array" },
+        "popular": { "type": "boolean" },
+        "isCustom": { "type": "boolean" },
+        "order": { "type": "number" }
+      },
+      "required": ["id", "name", "price"]
+    },
+    "Inquiry": {
+      "title": "Contact Inquiry",
+      "description": "Incoming client contact form inquiry",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 256 },
+        "phone": { "type": "string", "maxLength": 64 },
+        "company": { "type": "string", "maxLength": 160 },
+        "service": { "type": "string", "maxLength": 128 },
+        "projectTopic": { "type": "string", "maxLength": 256 },
+        "message": { "type": "string", "maxLength": 3000 },
+        "status": { "type": "string", "enum": ["new", "in_progress", "replied", "archived"], "maxLength": 32 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "email", "message"]
+    },
+    "Booking": {
+      "title": "Consultation Booking",
+      "description": "Discovery call consultation booking",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "clientName": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 256 },
+        "phone": { "type": "string", "maxLength": 64 },
+        "service": { "type": "string", "maxLength": 128 },
+        "preferredDate": { "type": "string", "maxLength": 64 },
+        "timeSlot": { "type": "string", "maxLength": 64 },
+        "notes": { "type": "string", "maxLength": 1000 },
+        "status": { "type": "string", "enum": ["pending", "confirmed", "completed", "cancelled"], "maxLength": 32 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["clientName", "email", "service", "preferredDate"]
+    },
+    "Testimonial": {
+      "title": "Client Testimonial",
+      "description": "Client review and review ratings",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "clientName": { "type": "string", "maxLength": 128 },
+        "clientRole": { "type": "string", "maxLength": 128 },
+        "company": { "type": "string", "maxLength": 160 },
+        "content": { "type": "string", "maxLength": 2000 },
+        "rating": { "type": "number" },
+        "avatarUrl": { "type": "string", "maxLength": 1024 },
+        "featured": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "clientName", "content", "rating"]
+    },
+    "BlogPost": {
+      "title": "Agency Blog Post",
+      "description": "Digital marketing articles, insights and updates",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 200 },
+        "slug": { "type": "string", "maxLength": 200 },
+        "excerpt": { "type": "string", "maxLength": 600 },
+        "content": { "type": "string", "maxLength": 20000 },
+        "coverImage": { "type": "string", "maxLength": 2048 },
+        "authorName": { "type": "string", "maxLength": 128 },
+        "authorRole": { "type": "string", "maxLength": 128 },
+        "category": { "type": "string", "maxLength": 100 },
+        "readTime": { "type": "string", "maxLength": 64 },
+        "published": { "type": "boolean" },
+        "publishedAt": { "type": "string", "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "title", "slug", "excerpt", "content"]
+    },
+    "Setting": {
+      "title": "Site Settings",
+      "description": "Global agency contact and social settings",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 256 },
+        "phone": { "type": "string", "maxLength": 64 },
+        "whatsapp": { "type": "string", "maxLength": 64 },
+        "instagram": { "type": "string", "maxLength": 512 },
+        "linkedin": { "type": "string", "maxLength": 512 },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles and RBAC role status"
+    },
+    "/projects/{projectId}": {
+      "schema": "Project",
+      "description": "Showcase portfolio case studies"
+    },
+    "/services/{serviceId}": {
+      "schema": "Service",
+      "description": "Agency marketing service offerings"
+    },
+    "/pricing/{pricingId}": {
+      "schema": "PricingPlan",
+      "description": "Service pricing tiers and plans"
+    },
+    "/inquiries/{inquiryId}": {
+      "schema": "Inquiry",
+      "description": "Incoming client contact inquiries"
+    },
+    "/bookings/{bookingId}": {
+      "schema": "Booking",
+      "description": "Strategy call and consultation bookings"
+    },
+    "/testimonials/{testimonialId}": {
+      "schema": "Testimonial",
+      "description": "Client reviews and ratings"
+    },
+    "/blogPosts/{postId}": {
+      "schema": "BlogPost",
+      "description": "Digital marketing articles and case studies"
+    },
+    "/settings/{settingId}": {
+      "schema": "Setting",
+      "description": "Global website and contact settings"
+    }
+  }
+}

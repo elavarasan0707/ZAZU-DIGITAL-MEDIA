@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+@keyframes float3d {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-14px) rotate(2.5deg);
+  }
+}
+
+@keyframes floatReverse3d {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(14px) rotate(-2.5deg);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(1.12);
+  }
+}
+
+@keyframes rotateSlow3d {
+  from {
+    transform: rotateX(25deg) rotateY(0deg) rotateZ(0deg);
+  }
+  to {
+    transform: rotateX(25deg) rotateY(360deg) rotateZ(360deg);
+  }
+}
+
+@keyframes shimmerWave {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-float-3d {
+  animation: float3d 7s ease-in-out infinite;
+}
+
+.animate-float-reverse-3d {
+  animation: floatReverse3d 8.5s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 5s ease-in-out infinite;
+}
+
+.animate-rotate-slow-3d {
+  animation: rotateSlow3d 35s linear infinite;
+}
+
+/* 3D card perspective hover effect */
+.card-3d {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.card-3d:hover {
+  transform: translateY(-6px) scale(1.015);
+}
